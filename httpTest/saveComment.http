@@ -1,0 +1,10 @@
+# POST https://192.168.137.1:7000/user/addComment HTTP/1.1
+# content-type: application/json
+
+# {
+#     "userId": 1,
+#     "articleId": 1,
+#     "commentContent": "wwwwwwwwwwwwww"
+# }
+
+https://192.168.137.1:7000/default/getTypeInfo
