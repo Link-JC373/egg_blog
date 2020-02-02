@@ -8,6 +8,13 @@ module.exports = app => {
 
 
     router.post('/user/addComment', controller.user.articleOptions.addComment)
+    router.post('/user/addToComment', controller.user.articleOptions.addToComment)
     router.post('/user/addArticlePoint', controller.user.articleOptions.addArticlePoint)
     router.post('/user/reduceArticlePoint', controller.user.articleOptions.reduceArticlePoint)
+    router.post('/user/changeCommentLikes', controller.user.articleOptions.changeCommentLikes)
+    router.post('/user/addFavorites', controller.user.articleOptions.addFavorites)
+    router.post('/user/getFavorites', controller.user.articleOptions.getFavorites)
+    router.post('/user/favArticle', controller.user.articleOptions.favArticle)
+    router.post('/user/cancelFav', controller.user.articleOptions.cancelFav)
+    router.post('/user/register', controller.user.user.register)
 }

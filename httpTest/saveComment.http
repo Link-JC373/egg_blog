@@ -7,4 +7,4 @@
 #     "commentContent": "wwwwwwwwwwwwww"
 # }
 
-https://192.168.137.1:7000/default/getTypeInfo
+GET https://192.168.137.1:7000/default/getTypeInfo HTTP/1.1

@@ -57,6 +57,37 @@ class UserService extends Service {
         return { data: result }
     }
 
+    async findUser(params) {
+        const { ctx, app } = this
+        const { userName } = params
+        const result = await ctx.model.User.findOne({
+            where: {
+                username: userName
+            }
+        })
+        console.log(result);
+
+        return result
+    }
+
+    async register(params) {
+        const { ctx, app } = this
+        const { userName, passWord } = params
+        const flag = await this.findUser(params)
+        console.log(flag);
+
+        if (Boolean(flag)) {
+            return { data: { state: '100', message: '用户名已存在' } }
+        }
+
+        const res = await ctx.model.User.create({
+            username: userName,
+            password: passWord,
+            user_icon: 'https://mirror-gold-cdn.xitu.io/16cf9de539bc9ae43fb?imageView2/1/w/180/h/180/q/85/interlace/1'
+        })
+        return { data: { res, state: 200 } }
+    }
+
 }
 
 module.exports = UserService

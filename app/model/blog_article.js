@@ -23,11 +23,18 @@ module.exports = app => {
 
     BlogArticle.associate = function () {
         app.model.BlogArticle.hasOne(app.model.BlogType, { foreignKey: 'id', sourceKey: 'typeid' })
+        app.model.BlogArticle.hasOne(app.model.User, { foreignKey: 'id', sourceKey: 'userid' })
 
         app.model.BlogArticle.belongsTo(app.model.User, {
             foreignKey: 'userid',
             targetKey: 'id'
         })
+        app.model.BlogArticle.belongsTo(app.model.ArticleFavorites, {
+            foreignKey: 'id',
+            targetKey: 'article_id'
+        })
+
+
     }
     // BlogArticle.associate = function () {
 

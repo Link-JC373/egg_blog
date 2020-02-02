@@ -21,10 +21,25 @@ module.exports = app => {
     });
     User.associate = function () {
         app.model.User.hasMany(app.model.BlogArticle, { foreignKey: 'userid', sourceKey: 'id' })
+
+
         app.model.User.belongsTo(app.model.Comments, {
             foreignKey: 'id',
             targetKey: 'user_id'
         })
+        app.model.User.belongsTo(app.model.BlogArticle, {
+            foreignKey: 'id',
+            targetKey: 'userid'
+        })
+        app.model.User.belongsTo(app.model.CommentsToComments, {
+            foreignKey: 'id',
+            targetKey: 'user_id'
+        })
+        app.model.User.belongsTo(app.model.UserFavorites, {
+            foreignKey: 'id',
+            targetKey: 'user_id'
+        })
+
     }
 
     return User;

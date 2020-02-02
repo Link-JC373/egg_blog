@@ -59,6 +59,11 @@ class HomeController extends Controller {
     ctx.body = await this.service.default.home.queryComment(ctx.request.body)
 
   }
+  async getToComments() {
+    const { ctx } = this
+    ctx.body = await this.service.default.home.queryToComments(ctx.request.body)
+
+  }
 
 }
 

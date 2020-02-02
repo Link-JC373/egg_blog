@@ -23,6 +23,7 @@ module.exports = app => {
     Comments.associate = function () {
         app.model.Comments.hasOne(app.model.User, { foreignKey: 'id', sourceKey: 'user_id' })
         app.model.Comments.hasMany(app.model.CommentLikes, { foreignKey: 'comment_id', sourceKey: 'comment_id' })
+        app.model.Comments.hasMany(app.model.CommentsToComments, { foreignKey: 'comment_id', sourceKey: 'comment_id' })
     }
 
     return Comments;

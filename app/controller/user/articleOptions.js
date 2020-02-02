@@ -45,6 +45,39 @@ class ArticleInterController extends Controller {
         ctx.body = await this.service.user.articleOptions.reduceArticlePoint(params)
     }
 
+    async addToComment() {
+        const { ctx } = this
+        let params = ctx.request.body
+        ctx.body = await this.service.user.articleOptions.addToComment(params)
+    }
+    async changeCommentLikes() {
+        const { ctx } = this
+        let params = ctx.request.body
+        ctx.body = await this.service.user.articleOptions.changeCommentLikes(params)
+    }
+
+    async addFavorites() {
+        const { ctx } = this
+        let params = ctx.request.body
+        ctx.body = await this.service.user.articleOptions.addFavorites(params)
+    }
+    async getFavorites() {
+        const { ctx } = this
+        let params = ctx.request.body
+        ctx.body = await this.service.user.articleOptions.getFavorites(params)
+    }
+
+    async favArticle() {
+        const { ctx } = this
+        let params = ctx.request.body
+        ctx.body = await this.service.user.articleOptions.favArticle(params)
+    }
+    async cancelFav() {
+        const { ctx } = this
+        let params = ctx.request.body
+        ctx.body = await this.service.user.articleOptions.cancelFav(params)
+    }
+
 }
 
 module.exports = ArticleInterController

@@ -8,4 +8,5 @@ module.exports = app => {
     router.post('/default/searchSomeThing', controller.default.home.searchArticle)
     router.post('/default/getArticleType', controller.default.home.getArticleType)
     router.post('/default/getComments', controller.default.home.getComments)
+    router.post('/default/getToComments', controller.default.home.getToComments)
 }
