@@ -88,6 +88,110 @@ class UserService extends Service {
         return { data: { res, state: 200 } }
     }
 
+    //得到评论自己文章的评论
+    async getCommented(params) {
+        const { ctx, app } = this
+        const { userId, pageNum = 1, pageSize = 5 } = params
+        const result = await ctx.model.Comments.findAndCountAll({
+            include: [
+                {
+                    model: ctx.model.User,
+                    attributes: ['username', 'user_icon', 'id', 'disc']
+                },
+                {
+                    model: ctx.model.BlogArticle,
+                    where: {
+                        userId: userId
+                    },
+                    attributes: ['title', 'id']
+
+                }
+            ],
+            attributes: ['comment_id', 'comment_content', 'like_counts', 'createdAt'],
+            order: [['comment_id', 'DESC']],
+            // order: [['comment_id', 'DESC']],
+            limit: toInt(pageSize),
+            offset: toInt(pageNum - 1) * 5,
+        })
+        let totalPages = parseInt(result.count / 5)
+
+        if (result.count % 5 !== 0) {
+            totalPages++
+        }
+
+        return { data: { ...result, pageNum, totalPages } }
+    }
+
+    //得到评论自己评论的评论
+    async getSubCommented(params) {
+        const { ctx, app } = this
+        const { userId, pageNum = 1, pageSize = 5 } = params
+        const result = await ctx.model.CommentsToComments.findAndCountAll({
+            where: {
+                tc_id: userId
+            },
+            include: [
+                {
+                    model: ctx.model.User,
+                    attributes: ['username', 'user_icon', 'id', 'disc']
+                },
+                {
+                    model: ctx.model.BlogArticle,
+                    attributes: ['title']
+
+                },
+            ],
+            attributes: ['article_id', 'comment_content', 'createdAt'],
+            order: [['ctc_id', 'DESC']],
+            limit: toInt(pageSize),
+            offset: toInt(pageNum - 1) * 5,
+        })
+
+        let totalPages = parseInt(result.count / 5)
+
+        if (result.count % 5 !== 0) {
+            totalPages++
+        }
+
+        return { data: { ...result, pageNum, totalPages } }
+
+    }
+
+    //得到给自己点赞的人
+    async getCommentLiked(params) {
+        const { ctx, app } = this
+        const { userId, pageNum = 1, pageSize = 5 } = params
+        const result = await ctx.model.CommentLikes.findAndCountAll({
+            include: [
+                {
+                    model: ctx.model.Comments,
+                    where: {
+                        user_id: userId
+                    },
+                    attributes: ['comment_content']
+
+                },
+                {
+                    model: ctx.model.User,
+                    attributes: ['username', 'user_icon', 'id', 'disc']
+                },
+            ],
+            attributes: ['createdAt'],
+            order: [['cl_id', 'DESC']],
+            limit: toInt(pageSize),
+            offset: toInt(pageNum - 1) * 5,
+
+        })
+
+        let totalPages = parseInt(result.count / 5)
+
+        if (result.count % 5 !== 0) {
+            totalPages++
+        }
+
+        return { data: { ...result, pageNum, totalPages } }
+
+    }
 }
 
 module.exports = UserService

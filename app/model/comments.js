@@ -16,14 +16,18 @@ module.exports = app => {
         comment_content: STRING,
         like_counts: INTEGER,
 
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
 
     });
     Comments.associate = function () {
-        app.model.Comments.hasOne(app.model.User, { foreignKey: 'id', sourceKey: 'user_id' })
+        app.model.Comments.belongsTo(app.model.User, { foreignKey: 'user_id', sourceKey: 'id' })
         app.model.Comments.hasMany(app.model.CommentLikes, { foreignKey: 'comment_id', sourceKey: 'comment_id' })
         app.model.Comments.hasMany(app.model.CommentsToComments, { foreignKey: 'comment_id', sourceKey: 'comment_id' })
+        app.model.Comments.belongsTo(app.model.BlogArticle, {
+            foreignKey: 'article_id',
+            targetKey: 'id'
+        })
     }
 
     return Comments;

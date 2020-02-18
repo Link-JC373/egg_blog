@@ -14,27 +14,29 @@ module.exports = app => {
         email: STRING(255),
         user_icon: STRING(255),
         disc: STRING(255),
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
         jwt: STRING(255),
 
     });
     User.associate = function () {
         app.model.User.hasMany(app.model.BlogArticle, { foreignKey: 'userid', sourceKey: 'id' })
+        app.model.User.hasMany(app.model.CommentsToComments, { foreignKey: 'user_id', sourceKey: 'id' })
+        app.model.User.hasMany(app.model.CommentLikes, { foreignKey: 'user_id', sourceKey: 'id' })
 
 
-        app.model.User.belongsTo(app.model.Comments, {
-            foreignKey: 'id',
-            targetKey: 'user_id'
+        app.model.User.hasMany(app.model.Comments, {
+            foreignKey: 'user_id',
+            targetKey: 'id'
         })
         app.model.User.belongsTo(app.model.BlogArticle, {
             foreignKey: 'id',
             targetKey: 'userid'
         })
-        app.model.User.belongsTo(app.model.CommentsToComments, {
-            foreignKey: 'id',
-            targetKey: 'user_id'
-        })
+        // app.model.User.belongsTo(app.model.CommentsToComments, {
+        //     foreignKey: 'id',
+        //     targetKey: 'user_id'
+        // })
         app.model.User.belongsTo(app.model.UserFavorites, {
             foreignKey: 'id',
             targetKey: 'user_id'

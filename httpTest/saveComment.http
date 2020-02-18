@@ -7,4 +7,11 @@
 #     "commentContent": "wwwwwwwwwwwwww"
 # }
 
-GET https://192.168.137.1:7000/default/getTypeInfo HTTP/1.1
+POST  http://192.168.137.1:7000/default/getFavArticle HTTP/1.1
+Content-Type: application/json
+
+{
+    "favId": 1,
+    "pageNum": 1
+}
+

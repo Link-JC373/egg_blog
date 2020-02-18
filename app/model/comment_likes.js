@@ -13,11 +13,13 @@ module.exports = app => {
         comment_id: INTEGER,
         user_id: INTEGER,
         visitor_id: INTEGER,
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
     });
     CommentLikes.associate = function () {
         app.model.CommentLikes.belongsTo(app.model.Comments, { foreignKey: 'comment_id', targetKey: 'comment_id' })
+        app.model.CommentLikes.belongsTo(app.model.User, { foreignKey: 'user_id', targetKey: 'id' })
+
     }
 
     // CommentLikes.

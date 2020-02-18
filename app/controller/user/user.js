@@ -99,6 +99,19 @@ class UserController extends Controller {
         const { ctx } = this;
         ctx.body = await this.service.user.user.register(ctx.request.body)
     }
+
+    async getCommented() {
+        const { ctx } = this
+        ctx.body = await this.service.user.user.getCommented(ctx.request.body)
+    }
+    async getSubCommented() {
+        const { ctx } = this
+        ctx.body = await this.service.user.user.getSubCommented(ctx.request.body)
+    }
+    async getCommentLiked() {
+        const { ctx } = this
+        ctx.body = await this.service.user.user.getCommentLiked(ctx.request.body)
+    }
 }
 
 module.exports = UserController

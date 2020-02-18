@@ -12,8 +12,8 @@ module.exports = app => {
         fav_id: INTEGER,
         user_id: INTEGER,
         article_id: INTEGER,
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
     });
     ArticleFavorites.associate = function () {
 

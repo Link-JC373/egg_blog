@@ -12,8 +12,8 @@ module.exports = app => {
         typename: STRING(255),
         ordernum: INTEGER,
         icon: STRING(255),
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
 
     });
     BlogType.associate = function () {

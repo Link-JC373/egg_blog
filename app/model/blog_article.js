@@ -15,8 +15,8 @@ module.exports = app => {
         userid: INTEGER,
         article_content: TEXT,
         introduce: TEXT,
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
         view_count: INTEGER
 
     });
@@ -24,6 +24,9 @@ module.exports = app => {
     BlogArticle.associate = function () {
         app.model.BlogArticle.hasOne(app.model.BlogType, { foreignKey: 'id', sourceKey: 'typeid' })
         app.model.BlogArticle.hasOne(app.model.User, { foreignKey: 'id', sourceKey: 'userid' })
+        app.model.BlogArticle.hasMany(app.model.Comments, { foreignKey: 'article_id', sourceKey: 'id' })
+        app.model.BlogArticle.hasMany(app.model.CommentsToComments, { foreignKey: 'article_id', sourceKey: 'id' })
+
 
         app.model.BlogArticle.belongsTo(app.model.User, {
             foreignKey: 'userid',

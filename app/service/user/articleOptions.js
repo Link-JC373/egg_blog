@@ -21,11 +21,12 @@ class ArticleInterService extends Service {
 
     async addToComment(params) {
         const { ctx } = this;
-        const { userId, commentContent, tcId, tcName, commentId } = params
+        const { userId, commentContent, tcId, tcName, commentId, articleId } = params
         const result = await ctx.model.CommentsToComments.create({
             user_id: userId,
             comment_content: commentContent,
             tc_id: tcId,
+            article_id: articleId,
             tc_name: tcName,
             comment_id: commentId,
         })
@@ -151,23 +152,38 @@ class ArticleInterService extends Service {
             fav_name: favName
 
         })
+
         const result = await this.getFavorites(params)
         return { data: result }
     }
     async getFavorites(params) {
         const { ctx, app } = this;
-        const { userId } = params
+        const { userId, articleId } = params
 
 
-        const result = await app.model.UserFavorites.findAll({
+        let result = await app.model.UserFavorites.findAll({
             where: {
                 user_id: userId
             },
             include: {
                 model: ctx.model.ArticleFavorites,
 
-            }
+            },
+            attributes: ['fav_id', 'fav_name', 'user_id', 'createdAt']
         })
+
+        for (let i = 0; i < result.length; i++) {
+            let isFav = false
+            result[i].articles_favorites.map((item, index) => {
+                if (item.article_id === articleId) {
+
+                    isFav = true
+                }
+            })
+
+            result[i].dataValues.isFav = isFav
+        }
+        // console.log(result);
 
 
 
@@ -218,6 +234,19 @@ class ArticleInterService extends Service {
         })
 
         return { data: result }
+    }
+    async addArticle(params) {
+        const { ctx, app } = this
+        const { userId, title, articleContent, typeid, introduce } = params
+        const result = await app.model.BlogArticle.create({
+            title: title,
+            userid: userId,
+            article_content: articleContent,
+            introduce: introduce,
+            typeid: typeid
+        })
+        await app.redis.hset('article', result.id, 0)
+        return { data: { status: 200, result } }
     }
 }
 

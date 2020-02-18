@@ -1,0 +1,10 @@
+POST  http://192.168.137.1:7000/user/addArticle HTTP/1.1
+Content-Type: application/json
+
+{
+    "userId": 1,
+    "title": "testPost",
+    "introduce": "success",
+    "typeid": 1,
+    "articleContent": "It will success"
+}

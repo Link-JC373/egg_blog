@@ -12,8 +12,8 @@ module.exports = app => {
         al_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         article_id: INTEGER,
         user_id: INTEGER,
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
 
 
     });

@@ -16,8 +16,8 @@ module.exports = app => {
         article_id: INTEGER,
         user_id: INTEGER,
         comment_content: STRING,
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
 
     });
     CommentsToComments.associate = function () {
@@ -26,8 +26,18 @@ module.exports = app => {
             foreignKey: 'comment_id',
             targetKey: 'comment_id'
         })
+
+        // app.model.CommentsToComments.hasOne(app.model.User, {
+        //     foreignKey: 'id',
+        //     targetKey: 'user_id'
+        // })
+
+        app.model.CommentsToComments.belongsTo(app.model.BlogArticle, {
+            foreignKey: 'article_id',
+            targetKey: 'id'
+        })
         // app.model.CommentsToComments.has
-        app.model.CommentsToComments.hasOne(app.model.User, { foreignKey: 'id', sourceKey: 'user_id' })
+        app.model.CommentsToComments.belongsTo(app.model.User, { foreignKey: 'user_id', sourceKey: 'id' })
 
     }
 

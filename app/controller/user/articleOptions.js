@@ -66,6 +66,11 @@ class ArticleInterController extends Controller {
         let params = ctx.request.body
         ctx.body = await this.service.user.articleOptions.getFavorites(params)
     }
+    async addArticle() {
+        const { ctx } = this
+        let params = ctx.request.body
+        ctx.body = await this.service.user.articleOptions.addArticle(params)
+    }
 
     async favArticle() {
         const { ctx } = this

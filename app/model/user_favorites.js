@@ -11,8 +11,8 @@ module.exports = app => {
         fav_id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         user_id: INTEGER,
         fav_name: STRING,
-        created_at: DATE,
-        updated_at: DATE,
+        createdAt: DATE,
+        updatedAt: DATE,
     });
     UserFavorites.associate = function () {
         app.model.UserFavorites.hasMany(app.model.ArticleFavorites, { foreignKey: 'fav_id', sourceKey: 'fav_id' })

@@ -48,6 +48,12 @@ class HomeController extends Controller {
 
   }
 
+  async getMyComment() {
+    const { ctx } = this
+    const param = ctx.request.body
+    ctx.body = await this.service.default.home.getMyComment(param)
+  }
+
   async getArticleType() {
     const { ctx } = this
     ctx.body = await this.service.default.home.getArticleType()
@@ -62,6 +68,16 @@ class HomeController extends Controller {
   async getToComments() {
     const { ctx } = this
     ctx.body = await this.service.default.home.queryToComments(ctx.request.body)
+
+  }
+  async initFavArticle() {
+    const { ctx } = this
+    ctx.body = await this.service.default.home.initFavArticle(ctx.request.body)
+
+  }
+  async getFavArticle() {
+    const { ctx } = this
+    ctx.body = await this.service.default.home.getFavArticle(ctx.request.body)
 
   }
 

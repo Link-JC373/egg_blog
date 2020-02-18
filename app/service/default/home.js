@@ -79,7 +79,7 @@ class HomeService extends Service {
     //搜索
     async searchArticle(params) {
         // console.log(searchContent + '============================');
-        const { searchContent, pageNum = 0, pageSize = 5, articleTypeId, userId } = params
+        const { searchContent, pageNum = 1, pageSize = 5, articleTypeId, userId } = params
         let searchParams = []
         let typeParams = []
         console.log(searchContent);
@@ -107,7 +107,7 @@ class HomeService extends Service {
             where: {
                 [Op.and]: searchParams
             },
-            attributes: ['id', 'title', 'introduce'],
+            // attributes: ['id', 'title', 'introduce'],
             include: [
                 {
                     where: {
@@ -122,16 +122,25 @@ class HomeService extends Service {
                 {
                     model: ctx.model.User,
                     attributes: ['username', 'id', 'user_icon', 'disc']
+                },
+                {
+                    model: ctx.model.Comments,
+                    attributes: ['comment_id']
+                },
+                {
+                    model: ctx.model.CommentsToComments,
+                    attributes: ['ctc_id']
                 }
             ],
-            order: [['id']],
+            order: [['id', 'DESC']],
             limit: toInt(pageSize),
-            offset: toInt(pageNum) * 5,
+            offset: toInt(pageNum - 1) * 5,
         })
 
         for (let i = 0; i < result.rows.length; i++) {
 
             result.rows[i].dataValues.likeCount = await app.redis.hget('article', result.rows[i].dataValues.id)
+            result.rows[i].dataValues.likeCount = +result.rows[i].dataValues.likeCount
 
         }
 
@@ -148,6 +157,66 @@ class HomeService extends Service {
         }
     }
 
+
+
+    async getMyComment(params) {
+        const { ctx, app } = this
+        const { userId, pageNum = 1, pageSize = 5 } = params
+        const commentRes = await ctx.model.Comments.findAndCountAll({
+            where: {
+                user_id: userId
+            },
+            include: [{
+
+                model: ctx.model.User,
+                attributes: ['username', 'user_icon', 'id', 'disc']
+            },
+            {
+
+                model: ctx.model.BlogArticle,
+                attributes: ['id', 'introduce', 'title']
+            },
+            ],
+            limit: toInt(pageSize),
+            offset: toInt(pageNum - 1) * 5,
+        })
+        const ctcRes = await ctx.model.CommentsToComments.findAndCountAll({
+            where: {
+                user_id: userId
+            },
+            include: [{
+
+                model: ctx.model.User,
+                attributes: ['username', 'user_icon', 'id', 'disc']
+            },
+            {
+
+                model: ctx.model.BlogArticle,
+                attributes: ['id', 'introduce', 'title']
+            },],
+            limit: toInt(pageSize),
+            offset: toInt(pageNum - 1) * 5,
+        })
+
+        let totalPages;
+        if (commentRes.count > ctcRes.count) {
+            totalPages = parseInt(commentRes.count / 5)
+
+            if (commentRes.count % 5 !== 0) {
+                totalPages++
+            }
+        } else {
+            totalPages = parseInt(ctcRes.count / 5)
+
+            if (ctcRes.count % 5 !== 0) {
+                totalPages++
+            }
+        }
+
+
+        const result = { commentRes, ctcRes, pageNum, totalPages };
+        return { data: result }
+    }
 
 
     async queryComment(params) {
@@ -251,6 +320,68 @@ class HomeService extends Service {
         })
         console.log(result);
 
+        return { data: result }
+    }
+
+    async initFavArticle(params) {
+        const { ctx } = this
+        const { userId, favId } = params
+        console.log(params);
+
+        const user = await ctx.model.User.findByPk(userId
+            ,
+            {
+                attributes: ['username', 'disc', 'user_icon', 'id']
+            })
+        let userFav = await ctx.model.UserFavorites.findOne({
+            where: {
+                fav_id: favId
+            },
+            attributes: ['fav_name', 'updatedAt']
+        })
+
+        let result = await this.getFavArticle({ favId: favId })
+        result.data = {
+            ...result.data,
+            fav_name: userFav.fav_name,
+            updatedAt: userFav.updatedAt,
+        }
+        return { data: { user, ...result } }
+    }
+
+    async getFavArticle(params) {
+        const { ctx } = this
+        const { favId, pageNum = 1, pageSize = 10 } = params
+        console.log(favId);
+
+        let result = await ctx.model.ArticleFavorites.findAndCountAll({
+            where: {
+                fav_id: favId
+            },
+            include: [
+                {
+                    model: ctx.model.BlogArticle,
+                    attributes: ['id', 'title', 'createdAt'],
+                    include: {
+                        model: ctx.model.User,
+                        attributes: ['username', 'disc', 'user_icon', 'id']
+                    }
+                },
+            ],
+            limit: toInt(pageSize),
+            offset: toInt(pageNum - 1) * pageSize,
+        })
+        let total_pages = parseInt(result.count / pageSize)
+
+        if (result.count % pageSize !== 0) {
+            total_pages++
+        }
+        result = {
+            ...result,
+            total_pages,
+            pageNum,
+            // likedList
+        }
         return { data: result }
     }
 

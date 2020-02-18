@@ -51,7 +51,7 @@ module.exports = appInfo => {
   config.jwt = {
     secret: 'egg-api-jwt',
     // match: ['/admin', '/user'],
-    ignore: ['/user/checkLogin', '/user/register', '/default/']
+    ignore: ['/user/checkLogin', '/user/addArticle', '/user/getCommentLiked', '/user/getSubCommented', '/default/']
   }
   config.cluster = {
     listen: {
