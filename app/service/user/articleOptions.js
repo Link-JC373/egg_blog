@@ -58,7 +58,7 @@ class ArticleInterService extends Service {
 
     async queryComment(params) {
         const { ctx } = this;
-        const { articleId, pageNum = 1, pageSize = 5, userId = 0 } = params
+        const { articleId, pageNum = 1, pageSize = 10, userId = 0 } = params
         //拿到所有评论
         let result = await ctx.model.Comments.findAndCountAll({
             where: {
@@ -90,13 +90,14 @@ class ArticleInterService extends Service {
             ],
             order: [['comment_id']],
             // order: [['comment_id', 'DESC']],
+            distinct: true,
             limit: toInt(pageSize),
-            offset: toInt(pageNum - 1) * 5,
+            offset: toInt(pageNum - 1) * pageSize,
         })
 
-        let total_pages = parseInt(result.count / 5)
+        let total_pages = parseInt(result.count / pageSize)
 
-        if (result.count % 5 !== 0) {
+        if (result.count % pageSize !== 0) {
             total_pages++
         }
         result = {
@@ -110,6 +111,7 @@ class ArticleInterService extends Service {
 
 
 
+    //文章点赞
     async addArticlePoint(params) {
         const { ctx, app } = this;
         const { articleId, userId } = params
@@ -123,6 +125,8 @@ class ArticleInterService extends Service {
         return { data: result }
 
     }
+
+    //取消文章点赞
     async reduceArticlePoint(params) {
         const { ctx, app } = this;
         const { articleId, userId } = params
@@ -142,6 +146,7 @@ class ArticleInterService extends Service {
 
     }
 
+    //增加收藏夹
     async addFavorites(params) {
         const { ctx, app } = this;
         const { userId, favName } = params
@@ -156,6 +161,8 @@ class ArticleInterService extends Service {
         const result = await this.getFavorites(params)
         return { data: result }
     }
+
+    //得到收藏夹
     async getFavorites(params) {
         const { ctx, app } = this;
         const { userId, articleId } = params
@@ -169,6 +176,7 @@ class ArticleInterService extends Service {
                 model: ctx.model.ArticleFavorites,
 
             },
+            distinct: true,
             attributes: ['fav_id', 'fav_name', 'user_id', 'createdAt']
         })
 
@@ -192,6 +200,7 @@ class ArticleInterService extends Service {
     }
 
 
+    //取消收藏
     async cancelFav(params) {
         const { ctx, app } = this
         const { userId, articleId, favId } = params
@@ -222,6 +231,8 @@ class ArticleInterService extends Service {
 
         return { data: result }
     }
+
+    //收藏文章
     async favArticle(params) {
         const { ctx, app } = this
         const { userId, articleId, favId } = params
@@ -235,6 +246,8 @@ class ArticleInterService extends Service {
 
         return { data: result }
     }
+
+    //发表文章
     async addArticle(params) {
         const { ctx, app } = this
         const { userId, title, articleContent, typeid, introduce } = params
@@ -246,7 +259,16 @@ class ArticleInterService extends Service {
             typeid: typeid
         })
         await app.redis.hset('article', result.id, 0)
-        return { data: { status: 200, result } }
+        const userInfo = await app.model.User.findByPk(userId,
+            {
+                attributes: ['article_count']
+            }
+        )
+        //userInfo.article_count + 1
+        await app.model.User.update({ article_count: userInfo.article_count + 1 }, { where: { id: userId } })
+        console.log(userInfo);
+
+        return { data: { status: 200, userInfo } }
     }
 }
 

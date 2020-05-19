@@ -4,8 +4,8 @@
     "password": "7014@ljc",
     "database": "flutter_blog_dev",
     "host": "127.0.0.1",
-    "dialect": "mysql",
-    "operatorsAliases": false
+    "dialect": "mysql"
+
   },
   "test": {
     "username": "root",

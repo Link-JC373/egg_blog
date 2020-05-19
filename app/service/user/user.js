@@ -24,10 +24,10 @@ class UserService extends Service {
 
         return { data: result }
     }
-    async saveToken(jwt, userName) {
+    async saveToken(jwt, userId) {
         const { ctx } = this;
 
-        const result = await ctx.model.User.update({ jwt: jwt }, { where: { username: userName } })
+        const result = await ctx.model.User.update({ jwt: jwt }, { where: { id: userId } })
         console.log(result + 'saveToken');
 
         return { data: result }
@@ -91,7 +91,7 @@ class UserService extends Service {
     //得到评论自己文章的评论
     async getCommented(params) {
         const { ctx, app } = this
-        const { userId, pageNum = 1, pageSize = 5 } = params
+        const { userId, pageNum = 1, pageSize = 10 } = params
         const result = await ctx.model.Comments.findAndCountAll({
             include: [
                 {
@@ -111,11 +111,11 @@ class UserService extends Service {
             order: [['comment_id', 'DESC']],
             // order: [['comment_id', 'DESC']],
             limit: toInt(pageSize),
-            offset: toInt(pageNum - 1) * 5,
+            offset: toInt(pageNum - 1) * pageSize,
         })
-        let totalPages = parseInt(result.count / 5)
+        let totalPages = parseInt(result.count / pageSize)
 
-        if (result.count % 5 !== 0) {
+        if (result.count % pageSize !== 0) {
             totalPages++
         }
 
@@ -125,7 +125,7 @@ class UserService extends Service {
     //得到评论自己评论的评论
     async getSubCommented(params) {
         const { ctx, app } = this
-        const { userId, pageNum = 1, pageSize = 5 } = params
+        const { userId, pageNum = 1, pageSize = 10 } = params
         const result = await ctx.model.CommentsToComments.findAndCountAll({
             where: {
                 tc_id: userId
@@ -141,15 +141,16 @@ class UserService extends Service {
 
                 },
             ],
+            distinct: true,
             attributes: ['article_id', 'comment_content', 'createdAt'],
             order: [['ctc_id', 'DESC']],
             limit: toInt(pageSize),
-            offset: toInt(pageNum - 1) * 5,
+            offset: toInt(pageNum - 1) * pageSize,
         })
 
-        let totalPages = parseInt(result.count / 5)
+        let totalPages = parseInt(result.count / pageSize)
 
-        if (result.count % 5 !== 0) {
+        if (result.count % pageSize !== 0) {
             totalPages++
         }
 
@@ -160,7 +161,7 @@ class UserService extends Service {
     //得到给自己点赞的人
     async getCommentLiked(params) {
         const { ctx, app } = this
-        const { userId, pageNum = 1, pageSize = 5 } = params
+        const { userId, pageNum = 1, pageSize = 10 } = params
         const result = await ctx.model.CommentLikes.findAndCountAll({
             include: [
                 {
@@ -176,16 +177,17 @@ class UserService extends Service {
                     attributes: ['username', 'user_icon', 'id', 'disc']
                 },
             ],
+            distinct: true,
             attributes: ['createdAt'],
             order: [['cl_id', 'DESC']],
             limit: toInt(pageSize),
-            offset: toInt(pageNum - 1) * 5,
+            offset: toInt(pageNum - 1) * pageSize,
 
         })
 
-        let totalPages = parseInt(result.count / 5)
+        let totalPages = parseInt(result.count / pageSize)
 
-        if (result.count % 5 !== 0) {
+        if (result.count % pageSize !== 0) {
             totalPages++
         }
 

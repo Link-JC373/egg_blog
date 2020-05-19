@@ -1,4 +1,3 @@
-
 module.exports = app => {
     const checktoken = app.middleware.jwt();
     const { router, controller } = app
@@ -18,7 +17,10 @@ module.exports = app => {
     router.post('/user/addArticle', controller.user.articleOptions.addArticle)
 
     router.post('/user/cancelFav', controller.user.articleOptions.cancelFav)
+
+    //注册
     router.post('/user/register', controller.user.user.register)
+
     router.post('/user/getCommented', controller.user.user.getCommented)
     router.post('/user/getSubCommented', controller.user.user.getSubCommented)
     router.post('/user/getCommentLiked', controller.user.user.getCommentLiked)

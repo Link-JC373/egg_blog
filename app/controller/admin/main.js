@@ -1,4 +1,5 @@
 'use strict'
+const { signToken } = require('../../utils/handle_token')
 
 const Controller = require('egg').Controller
 const JWT = require('jsonwebtoken')
@@ -14,46 +15,96 @@ class MainController extends Controller {
         this.ctx.body = 'hi api'
     }
     async checkLogin() {
-        let params = {
-            userName: '',
-            password: '',
-        }
-        console.log(this.ctx.request.body);
+        const { ctx } = this;
+        let params = ctx.request.body
+
+
         try {
-            this.ctx.validate(loginRule, this.ctx.request.body)
-
+            ctx.validate(loginRule, params)
         } catch (error) {
-            // this.ctx.status = 403
-            this.ctx.body = { 'status': 403, 'message': '输入的数据不符合要求' }
+            ctx.body = { status: 400, message: error }
             return
-            // return this.ctx.throw(403, { 'status': 403, 'message': '输入的数据不符合要求' })
-
         }
-        params = this.ctx.request.body
         const res = await this.service.admin.main.checkLogin(params)
-        // console.log(res[0].userName);
 
-        if (res.length > 0) {
-            const token = JWT.sign(
-                {
-                    userName: res[0].userName,
+        if (res.data) {
+            let signData = signToken(res, this.config.jwt.secret)
+            // console.log(signData.token);
+            // console.log(signData.userName);
+
+            await this.service.admin.main.saveToken(signData.token, res.data.admin_id)
+            console.log(res.data);
+
+            ctx.body = {
+                data: {
+                    userId: res.data.admin_id,
+                    userName: res.data.admin_name,
                 },
-                this.config.jwt.secret,
-                {
-                    expiresIn: 60 * 60
-                }
-            )
+                ...signData
+            }
+        }
+        else {
+            ctx.body = { status: 101, data: { message: '用户名或密码错误' } }
 
-            let openId = new Date().getTime()
-            this.ctx.session.openId = { 'openId': openId }
-            this.ctx.body = { 'status': 200, 'data': '登录成功', 'openId': openId, token }
+        }
+
+
+    }
+
+    async getPieData() {
+        const { ctx } = this;
+        let params = ctx.request.body
+        // ctx.body = await this.service.admin.main.getArticleByTimeBetween('2020-1', '2020-2')
+        ctx.body = await this.service.admin.main.getPieData()
+
+    }
+
+    async getHistogram() {
+        const { ctx } = this;
+        let { times } = ctx.request.body
+        let result = []
+        for (const time of times) {
+            let obj = await this.service.admin.main.getArticleByTimeBetween(time[0], time[1])
+            result.push(obj)
+        }
+        ctx.body = { data: result }
+    }
+
+    async queryUser() {
+        const { ctx } = this;
+        let params = ctx.request.body
+        ctx.body = await this.service.admin.main.getUser(params)
+    }
+
+    async queryComment() {
+        const { ctx } = this;
+        let { types = 1, ...params } = ctx.request.body;
+        if (types === 1) {
+            ctx.body = await this.service.admin.main.queryComment(params);
         } else {
-            this.ctx.body = { 'status': 403, 'message': '用户名或密码错误' }
+            ctx.body = await this.service.admin.main.querySubComment(params)
         }
     }
-    async test() {
-        this.ctx.body = 'Nice afei!'
+
+    async queryArticle() {
+        const { ctx } = this;
+        let params = ctx.request.body;
+        ctx.body = await this.service.default.home.searchArticle(params);
     }
+
+    async deleteUser() {
+        const { ctx } = this;
+        let params = ctx.request.body;
+        ctx.body = await this.service.admin.main.deleteUserById(params.userId)
+        // ctx.body = await this.service.admin.main.getUser(params)
+    }
+    async deleteArticle() {
+        const { ctx } = this;
+        let params = ctx.request.body;
+        ctx.body = await this.service.admin.main.deleteArticleById(params.articleId)
+        // ctx.body = await this.service.admin.main.getUser(params)
+    }
+
 }
 
 module.exports = MainController

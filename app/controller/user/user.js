@@ -26,7 +26,7 @@ class UserController extends Controller {
             // console.log(signData.token);
             // console.log(signData.userName);
 
-            await this.service.user.user.saveToken(signData.token, params.userName)
+            await this.service.user.user.saveToken(signData.token, res.data.id)
             console.log(res.data);
 
             ctx.body = {
@@ -41,6 +41,7 @@ class UserController extends Controller {
             }
         }
         else {
+            //这里为啥会是403，我吐了，我当时在想啥？
             ctx.body = { 'status': 403, 'message': '用户名或密码错误' }
         }
 
@@ -54,6 +55,7 @@ class UserController extends Controller {
         let filename = new Date().getTime() + stream.filename
 
         let target = path.join('./', `uploadfile/${filename}`)
+        // console.log(target)
 
         const writeStream = fs.createWriteStream(target);
         try {

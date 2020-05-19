@@ -1,0 +1,7 @@
+POST  http://127.0.0.1:7000/default/getFavorites HTTP/1.1
+Content-Type: application/json
+
+{
+    "pageNum":1,
+    "userId":1
+}

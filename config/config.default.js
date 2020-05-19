@@ -43,7 +43,7 @@ module.exports = appInfo => {
   }
 
   config.cors = {
-    origin: 'http://localhost:3000',
+    origin: '*',
     credentials: true,
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIOS'
   }
@@ -51,16 +51,19 @@ module.exports = appInfo => {
   config.jwt = {
     secret: 'egg-api-jwt',
     // match: ['/admin', '/user'],
-    ignore: ['/user/checkLogin', '/user/addArticle', '/user/getCommentLiked', '/user/getSubCommented', '/default/']
+    ignore: ['/user/checkLogin', '/user/register', '/admin/checkLogin', '/admin/', '/default/']
   }
   config.cluster = {
     listen: {
       path: '',
       port: 7000,
+      // hostname:
+      // port: 7001,
+      hostname: '127.0.0.1',
       // hostname: '192.168.43.247',
-      hostname: '192.168.137.1',
+      // hostname: '192.168.137.1',
       // hostname: '10.112.6.156',
-      // hostname: '47.94.128.127',
+      //hostname: '47.94.128.127',
     }
   };
 
@@ -72,6 +75,28 @@ module.exports = appInfo => {
       db: 0,
     },
   }
+
+  // config.onerror = {
+  //   all(err, ctx) {
+  //     // 在此处定义针对所有响应类型的错误处理方法
+  //     // 注意，定义了 config.all 之后，其他错误处理方法不会再生效
+  //     ctx.body = 'error';
+  //     ctx.status = 500;
+  //   },
+  //   html(err, ctx) {
+  //     // html hander
+  //     ctx.body = '<h3>error</h3>';
+  //     ctx.status = 500;
+  //   },
+  //   json(err, ctx) {
+  //     // json hander
+  //     ctx.body = { message: 'error' };
+  //     ctx.status = 500;
+  //   },
+  //   jsonp(err, ctx) {
+  //     // 一般来说，不需要特殊针对 jsonp 进行错误定义，jsonp 的错误处理会自动调用 json 错误处理，并包装成 jsonp 的响应格式
+  //   },
+  // };
 
   return {
     ...config,

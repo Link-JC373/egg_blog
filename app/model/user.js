@@ -17,7 +17,7 @@ module.exports = app => {
         createdAt: DATE,
         updatedAt: DATE,
         jwt: STRING(255),
-
+        article_count: { type: INTEGER, defaultValue: 0 }
     });
     User.associate = function () {
         app.model.User.hasMany(app.model.BlogArticle, { foreignKey: 'userid', sourceKey: 'id' })

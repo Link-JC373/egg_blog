@@ -5,7 +5,7 @@ module.exports = app => {
         STRING,
         INTEGER,
         DATE,
-        TEXT
+        TEXT,
     } = app.Sequelize;
 
     const BlogArticle = app.model.define('blog_articles', {
@@ -17,7 +17,7 @@ module.exports = app => {
         introduce: TEXT,
         createdAt: DATE,
         updatedAt: DATE,
-        view_count: INTEGER
+        view_count: { type: INTEGER, defaultValue: 0 }
 
     });
 

@@ -48,18 +48,38 @@ class HomeController extends Controller {
 
   }
 
+  //查询用户的评论
   async getMyComment() {
     const { ctx } = this
     const param = ctx.request.body
     ctx.body = await this.service.default.home.getMyComment(param)
   }
 
+  async getUserComment() {
+    const { ctx } = this
+    const param = ctx.request.body
+    let comments = await this.service.default.home.getMyComment(param)
+    console.log(comments.data.commentRes.count + comments.data.ctcRes.count);
+
+    let res = {
+      data: {
+        total_pages: comments.data.totalPages,
+        pageNum: comments.data.pageNum,
+        rows: [...comments.data.commentRes.rows, ...comments.data.ctcRes.rows],
+        count: comments.data.commentRes.count + comments.data.ctcRes.count
+      }
+    }
+    ctx.body = res
+  }
+
   async getArticleType() {
     const { ctx } = this
     ctx.body = await this.service.default.home.getArticleType()
-
   }
 
+
+
+  //查询文章下的评论
   async getComments() {
     const { ctx } = this
     ctx.body = await this.service.default.home.queryComment(ctx.request.body)
@@ -78,7 +98,33 @@ class HomeController extends Controller {
   async getFavArticle() {
     const { ctx } = this
     ctx.body = await this.service.default.home.getFavArticle(ctx.request.body)
+  }
 
+  //拿到所有收藏夹
+  async getFavorites() {
+    const { ctx } = this
+    let params = ctx.request.body
+    let fav = await this.service.user.articleOptions.getFavorites(params)
+    let result = {
+      data: {
+        count: fav.data.length,
+        rows: fav.data,
+        pageNum: 1,
+        total_pages: 1
+      }
+    }
+    ctx.body = result
+  }
+
+  async getRanking() {
+    const { ctx } = this
+    ctx.body = await this.service.default.home.getRanking()
+  }
+
+  async findUserById() {
+    const { ctx } = this
+    // let params = ctx.request.body
+    ctx.body = await this.service.default.home.findUserById(ctx.params)
   }
 
 }

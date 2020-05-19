@@ -37,7 +37,7 @@ class ArticleInterController extends Controller {
         try {
             ctx.validate(addPointRule, params)
         } catch (error) {
-            print(error)
+            //print(error)
             throw ctx.body = { status: 400, message: error }
         }
         console.log("------------------");
@@ -61,6 +61,7 @@ class ArticleInterController extends Controller {
         let params = ctx.request.body
         ctx.body = await this.service.user.articleOptions.addFavorites(params)
     }
+    //拿到所有收藏夹
     async getFavorites() {
         const { ctx } = this
         let params = ctx.request.body

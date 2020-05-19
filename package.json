@@ -31,8 +31,8 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-flutter-blog",
-    "stop": "egg-scripts stop --title=egg-server-flutter-blog",
+    "start": "egg-scripts start --port=7001 --daemon --title=egg-server-showcase",
+    "stop": "egg-scripts stop [--title=egg-server]",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",
     "test": "npm run lint -- --fix && npm run test-local",

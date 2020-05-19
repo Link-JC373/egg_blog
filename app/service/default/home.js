@@ -79,7 +79,7 @@ class HomeService extends Service {
     //搜索
     async searchArticle(params) {
         // console.log(searchContent + '============================');
-        const { searchContent, pageNum = 1, pageSize = 5, articleTypeId, userId } = params
+        const { articleId, searchContent, pageNum = 1, pageSize = 10, articleTypeId, userId, userName } = params
         let searchParams = []
         let typeParams = []
         console.log(searchContent);
@@ -95,9 +95,25 @@ class HomeService extends Service {
                 userid: userId
             })
         }
-        if (articleTypeId) {
+        if (articleId) {
+            searchParams.push({
+                id: articleId
+            })
+        }
+        if (Boolean(articleTypeId) && Number(articleTypeId) !== 0) {
+            console.log(articleTypeId + '---------------');
+
             typeParams.push({
                 id: articleTypeId
+            })
+        }
+
+        let userInfo = []
+        if (userName) {
+            userInfo.push({
+                username: {
+                    [Op.like]: `%${userName}%`
+                }
             })
         }
 
@@ -121,6 +137,9 @@ class HomeService extends Service {
                 },
                 {
                     model: ctx.model.User,
+                    where: {
+                        [Op.and]: userInfo
+                    },
                     attributes: ['username', 'id', 'user_icon', 'disc']
                 },
                 {
@@ -132,9 +151,11 @@ class HomeService extends Service {
                     attributes: ['ctc_id']
                 }
             ],
+            distinct: true,
+            attributes: { exclude: ['article_content'] },
             order: [['id', 'DESC']],
             limit: toInt(pageSize),
-            offset: toInt(pageNum - 1) * 5,
+            offset: toInt(pageNum - 1) * pageSize,
         })
 
         for (let i = 0; i < result.rows.length; i++) {
@@ -146,9 +167,9 @@ class HomeService extends Service {
 
 
 
-        let total_pages = parseInt(result.count / 5)
+        let total_pages = parseInt(result.count / pageSize)
 
-        if (result.count % 5 !== 0) {
+        if (result.count % pageSize !== 0) {
             total_pages++
         }
 
@@ -157,11 +178,11 @@ class HomeService extends Service {
         }
     }
 
-
-
+    //下面两个方法应该整合到一起
+    //根据Id查找评论
     async getMyComment(params) {
         const { ctx, app } = this
-        const { userId, pageNum = 1, pageSize = 5 } = params
+        const { userId, pageNum = 1, pageSize = 10 } = params
         const commentRes = await ctx.model.Comments.findAndCountAll({
             where: {
                 user_id: userId
@@ -178,7 +199,7 @@ class HomeService extends Service {
             },
             ],
             limit: toInt(pageSize),
-            offset: toInt(pageNum - 1) * 5,
+            offset: toInt(pageNum - 1) * pageSize,
         })
         const ctcRes = await ctx.model.CommentsToComments.findAndCountAll({
             where: {
@@ -195,20 +216,20 @@ class HomeService extends Service {
                 attributes: ['id', 'introduce', 'title']
             },],
             limit: toInt(pageSize),
-            offset: toInt(pageNum - 1) * 5,
+            offset: toInt(pageNum - 1) * pageSize,
         })
 
         let totalPages;
         if (commentRes.count > ctcRes.count) {
-            totalPages = parseInt(commentRes.count / 5)
+            totalPages = parseInt(commentRes.count / pageSize)
 
-            if (commentRes.count % 5 !== 0) {
+            if (commentRes.count % pageSize !== 0) {
                 totalPages++
             }
         } else {
-            totalPages = parseInt(ctcRes.count / 5)
+            totalPages = parseInt(ctcRes.count / pageSize)
 
-            if (ctcRes.count % 5 !== 0) {
+            if (ctcRes.count % pageSize !== 0) {
                 totalPages++
             }
         }
@@ -218,10 +239,10 @@ class HomeService extends Service {
         return { data: result }
     }
 
-
+    //根据文章查找评论
     async queryComment(params) {
         const { ctx, app } = this;
-        const { articleId, pageNum = 1, pageSize = 5, userId = 0 } = params
+        const { articleId, pageNum = 1, pageSize = 10, userId = 0 } = params
         //拿到所有评论
         let result = await ctx.model.Comments.findAndCountAll({
             where: {
@@ -251,10 +272,11 @@ class HomeService extends Service {
 
                 }
             ],
-            order: [['comment_id']],
-            // order: [['comment_id', 'DESC']],
+            distinct: true,
+            // order: [['comment_id']],
+            order: [['comment_id', 'DESC']],
             limit: toInt(pageSize),
-            offset: toInt(pageNum - 1) * 5,
+            offset: toInt(pageNum - 1) * pageSize,
         })
         //拿到点赞的评论id
         // let likesRow = await ctx.model.Comments.findAndCountAll({
@@ -281,9 +303,9 @@ class HomeService extends Service {
         //     })
         // }
 
-        let total_pages = parseInt(result.count / 5)
+        let total_pages = parseInt(result.count / pageSize)
 
-        if (result.count % 5 !== 0) {
+        if (result.count % pageSize !== 0) {
             total_pages++
         }
         result = {
@@ -295,6 +317,7 @@ class HomeService extends Service {
         return { data: result }
     }
 
+    //查找主评论下的次级评论
     async queryToComments(params) {
         const { ctx } = this
         const { commentId } = params
@@ -308,6 +331,7 @@ class HomeService extends Service {
                 attributes: ['username', 'user_icon', 'id', 'disc'],
 
             },
+            distinct: true,
             order: [['ctc_id', 'DESC']]
         })
         return { data: result }
@@ -362,12 +386,18 @@ class HomeService extends Service {
                 {
                     model: ctx.model.BlogArticle,
                     attributes: ['id', 'title', 'createdAt'],
-                    include: {
-                        model: ctx.model.User,
-                        attributes: ['username', 'disc', 'user_icon', 'id']
-                    }
+                    include: [
+                        {
+                            model: ctx.model.User,
+                            attributes: ['username', 'disc', 'user_icon', 'id']
+                        },
+                        {
+                            model: ctx.model.BlogType,
+                        }
+                    ]
                 },
             ],
+            distinct: true,
             limit: toInt(pageSize),
             offset: toInt(pageNum - 1) * pageSize,
         })
@@ -385,6 +415,32 @@ class HomeService extends Service {
         return { data: result }
     }
 
+    //得到作者榜
+    async getRanking(params) {
+        const { ctx } = this
+        // const { favId, pageNum = 1, pageSize = 10 } = params
+        let result = await ctx.model.User.findAll({
+            limit: 3,
+            attributes: ['id', 'username', 'user_icon', 'disc', 'article_count'],
+            order: [['article_count', 'DESC']]
+        })
+        return { data: result }
+    }
+
+    //通过id查找用户
+    async findUserById(params) {
+        const { ctx } = this
+        const { userId } = params
+        console.log(params);
+
+        let result = await ctx.model.User.findByPk(toInt(userId), {
+            attributes: ['username', 'user_icon', 'disc', 'id']
+        })
+        console.log(result);
+
+        return { data: result }
+
+    }
 
 
 }

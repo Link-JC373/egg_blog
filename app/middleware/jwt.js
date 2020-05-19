@@ -14,8 +14,6 @@ module.exports = options => {
         //     await next()
         // } else
         // console.log(token === null);
-        console.log(token + "000000000000000000000");
-        console.log(!token);
 
         if (Boolean(token)) {
             //当前token存在
@@ -23,14 +21,21 @@ module.exports = options => {
 
                 const decode = JWT.verify(token, options.secret)
                 console.log(decode.exp, 'jwtdata');
-                const user = await ctx.model.User.findOne({
-                    where: {
-                        username: decode.userName,
-                    }
-                })
+                let user;
+                ctx.request.url.indexOf('/admin/') ?
+                    user = await ctx.model.User.findOne({
+                        where: {
+                            username: decode.userName,
+                        }
+                    })
+                    :
+                    user = await ctx.model.Admin.findOne({
+                        where: {
+                            admin_name: decode.userName
+                        }
+                    })
                 if (user.jwt !== token) {
-                    console.log("111111111111111111");
-
+                    //验证传来的 token 是否和数据库里的一致
                     return ctx.body = { status: 401, message: '没有权限，请登录' }
 
                 }
@@ -40,9 +45,7 @@ module.exports = options => {
                     return ctx.body = { status: 401, message: '没有权限，请登录' }
                 }
                 if (Math.round(new Date() / 1000) - decode.exp > 0) {
-                    // console.log(Date.now());
-                    console.log("333333333333333333");
-
+                    //验证token是否过期
                     return ctx.body = { status: 401, message: '登录已过期,请重新登录' }
                 }
 
@@ -58,7 +61,7 @@ module.exports = options => {
                 console.log("!!!!!!!!!!!!!!!!!!!!!!!!");
 
                 console.log(error);
-                // return ctx.body = { status: '401', message: error }
+                return ctx.body = { status: 401, message: error }
 
 
             }
