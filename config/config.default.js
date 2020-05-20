@@ -16,7 +16,7 @@ module.exports = appInfo => {
   config.keys = appInfo.name + '_1574394634433_3537';
 
   // add your middleware config here
-  config.middleware = ['errorHandler', 'jwt'];
+  config.middleware = ['errorHandler', 'jwt',];
   config.errorHandler = {
     match: '/admin'
   }
@@ -25,6 +25,8 @@ module.exports = appInfo => {
   const userConfig = {
     // myAppName: 'egg',
   };
+
+
 
   config.sequelize = {
     dialect: 'mysql',
@@ -51,19 +53,13 @@ module.exports = appInfo => {
   config.jwt = {
     secret: 'egg-api-jwt',
     // match: ['/admin', '/user'],
-    ignore: ['/user/checkLogin', '/user/register', '/admin/checkLogin', '/admin/', '/default/']
+    ignore: ['/api/user/checkLogin', '/api/user/register', '/api/admin/checkLogin', '/admin/', '/api/default/']
   }
   config.cluster = {
     listen: {
       path: '',
-      port: 7000,
-      // hostname:
-      // port: 7001,
+      port: 7001,
       hostname: '127.0.0.1',
-      // hostname: '192.168.43.247',
-      // hostname: '192.168.137.1',
-      // hostname: '10.112.6.156',
-      //hostname: '47.94.128.127',
     }
   };
 

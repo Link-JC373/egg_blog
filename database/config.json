@@ -17,7 +17,7 @@
   },
   "production": {
     "username": "root",
-    "password": "root",
+    "password": "7014@ljc",
     "database": "flutter_blog_dev",
     "host": "localhost",
     "dialect": "mysql",
