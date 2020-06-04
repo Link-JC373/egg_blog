@@ -14,31 +14,42 @@ module.exports = options => {
         //     await next()
         // } else
         // console.log(token === null);
+        console.log(token);
 
         if (Boolean(token)) {
             //当前token存在
             try {
+                console.log(options.secret);
 
                 const decode = JWT.verify(token, options.secret)
-                console.log(decode.exp, 'jwtdata');
+                console.log(decode);
                 let user;
-                ctx.request.url.indexOf('/admin/') ?
-                    user = await ctx.model.User.findOne({
-                        where: {
-                            username: decode.userName,
-                        }
-                    })
-                    :
+                // let userName = ctx.request.body
+                console.log(ctx.request.url.indexOf('/admin/') !== -1);
+
+                ctx.request.url.indexOf('/admin/') !== -1 ?
+
                     user = await ctx.model.Admin.findOne({
                         where: {
                             admin_name: decode.userName
                         }
                     })
-                if (user.jwt !== token) {
-                    //验证传来的 token 是否和数据库里的一致
-                    return ctx.body = { status: 401, message: '没有权限，请登录' }
+                    :
+                    user = await ctx.model.User.findOne({
+                        where: {
+                            username: decode.userName,
+                        }
+                    })
 
-                }
+                // if (user.jwt !== token) {
+                //     console.log(token);
+
+                //     console.log(user.jwt);
+
+                //     //验证传来的 token 是否和数据库里的一致
+                //     return ctx.body = { status: 401, message: '没有权限，请登录' }
+
+                // }
                 if (!decode.userName) {
                     console.log("222222222222222222");
 

@@ -1,9 +1,9 @@
 const JWT = require('jsonwebtoken')
 
-function signToken(res, secret) {
+function signToken(params, secret) {
     const token = JWT.sign(
         {
-            userName: res.data.dataValues.username,
+            userName: params.userName,
         },
         secret,
         {

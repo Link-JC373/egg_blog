@@ -22,7 +22,7 @@ class UserController extends Controller {
         const res = await this.service.user.user.checkLogin(params)
 
         if (res.data) {
-            let signData = signToken(res, this.config.jwt.secret)
+            let signData = signToken(params, this.config.jwt.secret)
             // console.log(signData.token);
             // console.log(signData.userName);
 
